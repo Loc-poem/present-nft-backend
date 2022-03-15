@@ -1,10 +1,29 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { DatabaseModule } from "./database/database.module";
+import { JwtStrategy } from "./modules/auth/strategies/jwt.strategy";
+import { JwtModule } from "@nestjs/jwt";
+import { ConfigModule } from "@nestjs/config";
+import { authModule } from "./modules/auth/auth.module";
 
 @Module({
-  imports: [],
+  imports: [
+    DatabaseModule,
+    authModule,
+    JwtModule.registerAsync({
+      useFactory: async () => ({
+        secret: process.env.JWT_SECRET,
+        signOptions: {
+          expiresIn: process.env.JWT_EXPIRATION_TIME,
+        },
+      }),
+    }),
+    ConfigModule.forRoot({
+      envFilePath: '.env',
+    }),
+  ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, JwtStrategy],
 })
 export class AppModule {}
