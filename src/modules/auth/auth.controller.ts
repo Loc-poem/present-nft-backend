@@ -87,7 +87,6 @@ export class authController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'update wallet for user' })
   async addWalletUser(@CurrentUser() user,@Body() data: AddWalletUserDto) {
-    console.log("user", user);
     return this.authService.addWalletUser(data,user);
   }
 }

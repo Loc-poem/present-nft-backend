@@ -17,6 +17,7 @@ export const UserSchema = new mongoose.Schema(
       currentStep: { type: Number },
       otpCode: { type: String },
       expiredDate: { type: Date },
+      term: { type: Boolean, default: true },
   },
     {
         timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' },
@@ -39,6 +40,7 @@ export interface User extends mongoose.Document {
     currentStep: number;
     otpCode: string,
     expiredDate: Date;
+    term: boolean;
     createdAt: Date;
     updatedAt: Date;
 }

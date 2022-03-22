@@ -37,6 +37,7 @@ export class authService {
       currentStep: AppConfig.LOGIN_STEP.VERIFY_OTP_CODE,
       otpCode: otpCode,
       expiredDate: expiredDate,
+      term: data.term,
     });
     const accessToken = Utils.generateToken(newUser, this.jwtService);
     newUser.lastToken = accessToken;
@@ -156,10 +157,10 @@ export class authService {
     await this.userModel.updateOne(
       { _id: user._id },
       {
-        nationality: data.nationality,
-        city: data.city,
-        zipCode: data.zipCode,
-        phoneNumber: data.phoneNumber,
+        nationality: data?.nationality || "",
+        city: data?.city || "",
+        zipCode: data?.zipCode || "",
+        phoneNumber: data?.phoneNumber || "",
         currentStep: AppConfig.LOGIN_STEP.ADD_WALLET,
       }
     );

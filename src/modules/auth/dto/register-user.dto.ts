@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsEmail, MinLength, MaxLength, IsString, Validate } from "class-validator";
+import { IsNotEmpty, IsEmail, MinLength, MaxLength, IsString, Validate, IsBoolean } from "class-validator";
 import { ValidatePasswordRule } from "../../../common/validate/password.validate";
 
 export class RegisterUserDto {
@@ -20,4 +20,8 @@ export class RegisterUserDto {
     @MinLength(5)
     @MaxLength(100)
     username: string;
+
+    @ApiProperty({ required: true })
+    @IsBoolean()
+    term: boolean;
 }

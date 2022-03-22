@@ -1,16 +1,16 @@
 import { ApiProperty } from "@nestjs/swagger";
 
 export class UpdateUserDto {
-  @ApiProperty({ required: true })
+  @ApiProperty({ required: false })
   nationality: string;
 
-  @ApiProperty({ required: true })
+  @ApiProperty({ required: false })
   city: string;
 
-  @ApiProperty({ required: true })
+  @ApiProperty({ required: false })
   zipCode: string;
 
-  @ApiProperty({ required: true })
+  @ApiProperty({ required: false })
   phoneNumber: string;
 }
 
