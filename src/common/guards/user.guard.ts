@@ -12,7 +12,7 @@ export class UserGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const user = Utils.decodeJwtService(request.headers['authorization'], this.jwtService);
     request.user = user;
-    return true
+    return true;
     throw new UnauthorizedException('Unauthorized');
   }
 }
