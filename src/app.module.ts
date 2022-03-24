@@ -6,11 +6,13 @@ import { JwtStrategy } from "./modules/auth/strategies/jwt.strategy";
 import { JwtModule } from "@nestjs/jwt";
 import { ConfigModule } from "@nestjs/config";
 import { authModule } from "./modules/auth/auth.module";
+import { userModule } from "./modules/user/user.module";
 
 @Module({
   imports: [
     DatabaseModule,
     authModule,
+    userModule,
     JwtModule.registerAsync({
       useFactory: async () => ({
         secret: process.env.JWT_SECRET,
