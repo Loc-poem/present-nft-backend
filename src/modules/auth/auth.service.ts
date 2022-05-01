@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { RegisterUserDto } from './dto/register-user.dto';
+import { BuyerLoginDto, RegisterUserDto } from "./dto/register-user.dto";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { User } from "../../database/models/user.model";
+import { User, USER_LOGIN_STATUS, USER_ROLE } from "../../database/models/user.model";
 import { Utils } from "../../common/utils/utils";
 import { ApiError } from "../../common/response/api-error";
 import { JwtService } from "@nestjs/jwt";
@@ -13,6 +13,7 @@ import { LoginUserDto } from "./dto/login.dto";
 import * as bcrypt from 'bcrypt';
 import { ResendVerifyOtpDto, VerifyOtpcodeDto } from "./dto/verify.dto";
 import { AddWalletUserDto, UpdateUserDto } from "./dto/update-user.dto";
+import * as fs from 'fs';
 
 @Injectable()
 export class authService {
@@ -181,4 +182,24 @@ export class authService {
     return new ApiOK({ result: true, step: AppConfig.LOGIN_STEP.ACTIVE });
   }
 
+  async buyerLogin(data: BuyerLoginDto) {
+    const { networkAddress } = data;
+    const userData = await this.userModel.findOne({ networkAddress: networkAddress.toLowerCase(), role: USER_ROLE.ARTIST }).lean();
+    const dirSrc = './src/assets/';
+    const dir = 'images/avatars/';
+    const listAvts = fs.readdirSync(dirSrc + dir);
+    const avt = listAvts[Math.floor(Math.random()*listAvts.length)];
+    if (!userData) {
+      const user = await this.userModel.create({
+        networkAddress: networkAddress.toLowerCase(),
+        isVerified: true,
+        role: USER_ROLE.ARTIST,
+        avatarUrl: `${dir + avt}`,
+      });
+      const accessToken = Utils.generateToken(user, this.jwtService);
+      return new ApiOK({ result: true, status: USER_LOGIN_STATUS.NOT_REGISTER, lastToken: accessToken });
+    };
+    const accessToken = Utils.generateToken(userData, this.jwtService);
+    return new ApiOK({ result: true, status: USER_LOGIN_STATUS.REGISTER, lastToken: accessToken });
+  }
 }

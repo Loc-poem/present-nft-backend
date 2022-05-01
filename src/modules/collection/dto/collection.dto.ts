@@ -35,13 +35,14 @@ export class CreateCollectionDto {
   @Type(() => Number)
   networkType: number;
 
-  @ApiProperty({ required: false, type: 'string', nullable: true })
-  signCollection: string;
-
   @ApiProperty({ required: true, type: 'string', nullable: false })
   @IsNotEmpty({ message: 'E26' })
   @IsString()
   txId: string;
+
+  @ApiProperty({ required: true })
+  @IsString()
+  symbol: string;
 }
 
 export class filterCollectionUserDto {
@@ -49,6 +50,9 @@ export class filterCollectionUserDto {
   @IsOptional()
   @IsMongoId({ message: 'E0' })
   collectionId: string;
+
+  @ApiProperty({ required: false })
+  filterByUser: boolean;
 
   @ApiProperty({ required: false })
   @IsOptional()
@@ -98,4 +102,19 @@ export class dataCreateCollectionDto {
   status: number;
   txId: string;
   creator: string;
+  symbol: string;
+  username: string;
+  userAvtUrl: string;
+}
+
+export class UnverifyCollectionDto {
+  @ApiProperty({ required: true, nullable: false })
+  @IsNotEmpty({ message: 'E26' })
+  @IsString()
+  @IsMongoId({ message: 'E0' })
+  collectionId: string;
+
+  @ApiProperty({ required: true })
+  @IsString()
+  collectionSalt: string;
 }

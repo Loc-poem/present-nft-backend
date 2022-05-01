@@ -1,7 +1,7 @@
-import { Body, HttpCode, HttpStatus, Post, Put, Request } from "@nestjs/common";
+import { Body, Global, HttpCode, HttpStatus, Post, Put, Request } from "@nestjs/common";
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Controller } from "@nestjs/common";
-import { RegisterUserDto } from "./dto/register-user.dto";
+import { BuyerLoginDto, RegisterUserDto } from "./dto/register-user.dto";
 import { authService } from "./auth.service";
 import { LoginUserDto } from "./dto/login.dto";
 import { ResendVerifyOtpDto, VerifyOtpcodeDto } from "./dto/verify.dto";
@@ -9,6 +9,7 @@ import { AddWalletUserDto, UpdateUserDto } from "./dto/update-user.dto";
 import { Auth } from "../../common/decorator/auth.decorator";
 import { CurrentUser } from "../../common/decorator/user.decorator";
 
+@Global()
 @ApiTags('Auth')
 @Controller('auth')
 export class authController {
@@ -40,6 +41,7 @@ export class authController {
   }
 
   @Post('verify-otp-code')
+  @Auth()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'verify otp code to verify account' })
   async verifyOtpCode(@Body() data: VerifyOtpcodeDto) {
@@ -88,5 +90,12 @@ export class authController {
   @ApiOperation({ summary: 'update wallet for user' })
   async addWalletUser(@CurrentUser() user,@Body() data: AddWalletUserDto) {
     return this.authService.addWalletUser(data,user);
+  }
+
+  @Post('buyer-login')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: " buyer login " })
+  async buyerLogin(@Body() data: BuyerLoginDto) {
+    return this.authService.buyerLogin(data);
   }
 }

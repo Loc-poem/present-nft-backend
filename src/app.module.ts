@@ -8,6 +8,9 @@ import { ConfigModule } from "@nestjs/config";
 import { authModule } from "./modules/auth/auth.module";
 import { userModule } from "./modules/user/user.module";
 import { collectionModule } from "./modules/collection/collection.module";
+import { join } from "path";
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { AppConfig } from "./common/contants/app-config";
 
 @Module({
   imports: [
@@ -25,6 +28,9 @@ import { collectionModule } from "./modules/collection/collection.module";
     }),
     ConfigModule.forRoot({
       envFilePath: '.env',
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', AppConfig.STATIC_DIR),
     }),
   ],
   controllers: [AppController],

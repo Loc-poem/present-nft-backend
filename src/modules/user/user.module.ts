@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { Global, Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 import { UserSchema } from "../../database/models/user.model";
 import { userController } from "./user.controller";
@@ -6,6 +6,7 @@ import { userService } from "./user.service";
 import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
 
+@Global()
 @Module({
   controllers: [userController],
   imports: [
@@ -23,7 +24,7 @@ import { PassportModule } from "@nestjs/passport";
     PassportModule.register({ defaultStrategy: "jwt" }),
   ],
   providers: [userService],
-  exports: [],
+  exports: [userService],
 })
 
 export class userModule {}

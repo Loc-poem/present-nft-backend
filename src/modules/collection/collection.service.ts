@@ -3,7 +3,12 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { User } from "../../database/models/user.model";
 import { Collection, COLLECTION_STATUS } from "../../database/models/collection.model";
-import { CreateCollectionDto, dataCreateCollectionDto, filterCollectionUserDto } from "./dto/collection.dto";
+import {
+  CreateCollectionDto,
+  dataCreateCollectionDto,
+  filterCollectionUserDto,
+  UnverifyCollectionDto
+} from "./dto/collection.dto";
 import { AppConfig } from "../../common/contants/app-config";
 import { ApiError } from "../../common/response/api-error";
 import { s3Service } from "../s3/s3.service";
@@ -28,7 +33,7 @@ export class collectionService {
 
     if (file.size > AppConfig.MAX_FILE_IMAGE_UPLOAD)
       throw new ApiError('Invalid file size.', 'E18', { field: 'fileLogo' });
-    const { type, fileLogo, name, description, contractAddress, networkType, signCollection, txId } = data;
+    const { type, fileLogo, name, description, contractAddress, txId, symbol } = data;
     // get url code
     let { urlCode } = data;
     urlCode = await this.getUrlCode(data);
@@ -56,6 +61,9 @@ export class collectionService {
     dataCreate.txId = txId;
     dataCreate.creator = userData.networkAddress;
     dataCreate.status = COLLECTION_STATUS.PROCESSING;
+    dataCreate.symbol = symbol;
+    dataCreate.username = user.username || "";
+    dataCreate.userAvtUrl = user.avatarUrl || "";
 
     const response = await this.collectionModel.create(dataCreate);
     return new ApiOK(response);
@@ -78,9 +86,23 @@ export class collectionService {
     return result;
   }
 
+  async updateUnVerifyCollection(user, data: UnverifyCollectionDto) {
+    const { collectionId, collectionSalt } = data;
+    let collection = await this.collectionModel.updateOne(
+      { _id: collectionId, userId: user._id, status: COLLECTION_STATUS.UNVERIFY },
+      { $set: { status: COLLECTION_STATUS.VERIFY, collectionSalt: collectionSalt } },
+    ) as any;
+
+    if (collection.ok === 1) return new ApiOK({ result: true });
+
+    return new ApiOK({ result: false });
+  }
+
+
   async getListCollectionOfUser(user, data: filterCollectionUserDto) {
     const where = {} as any;
-    where.userId = user._id;
+    if (data.collectionId) where['_id'] = data.collectionId;
+    if (data.filterByUser === true) where.userId = user._id;
     if (data.status) where.status = data.status;
     let sortField = 'createdAt';
     let sortType = -1;
@@ -107,5 +129,10 @@ export class collectionService {
       total: count,
       result: collectionData,
     })
+  };
+
+  async getListCollectionDiscover(data) {
+    const where = {} as any;
+
   }
 }

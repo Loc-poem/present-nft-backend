@@ -1,18 +1,21 @@
 import { CanActivate, ExecutionContext, ForbiddenException, Inject, Injectable, RequestMethod, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from "@nestjs/jwt";
 import { Utils } from "../utils/utils";
+import { Reflector } from "@nestjs/core";
+import { userService } from "../../modules/user/user.service";
 
 @Injectable()
 export class UserGuard implements CanActivate {
   constructor(
-    private readonly jwtService: JwtService,
+    private reflector: Reflector,
+    private readonly userService: userService,
   ) { }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const user = Utils.decodeJwtService(request.headers['authorization'], this.jwtService);
-    request.user = user;
+    let user = request.user;
+    const roles = this.reflector.get<number[]>('roles', context.getHandler());
+    user = await this.userService.getUserInformation(user);
+    if (roles && !roles.includes(user.role)) throw new UnauthorizedException('Unauthorized');
     return true;
-    throw new UnauthorizedException('Unauthorized');
   }
 }

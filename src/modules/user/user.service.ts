@@ -14,16 +14,18 @@ export class userService {
 
   async getUserInformation(user: any) {
     const userData = await this.userModel.findOne({ _id: user._id }).lean();
-    if (!user) throw new ApiError("Invalid user", "E-1");
+    if (!userData) throw new ApiError("Invalid user", "E-1");
     const returnData = {
-      username: userData.username,
-      email: userData.email,
-      nationality: userData?.nationality || "",
-      city: userData?.city || "",
-      zipCode: userData?.zipCode || "",
-      phoneNumber: userData?.phoneNumber || "",
-      currentStep: userData.currentStep,
+      username: userData.username || "",
+      email: userData.email || "",
+      networkAddress: userData.networkAddress,
+      nationality: userData.nationality || "",
+      city: userData.city || "",
+      zipCode: userData.zipCode || "",
+      phoneNumber: userData.phoneNumber || "",
+      avatarUrl: userData.avatarUrl || "",
+      role: userData.role,
     }
-    return new ApiOK(returnData)
+    return new ApiOK(returnData);
   }
 }

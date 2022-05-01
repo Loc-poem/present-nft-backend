@@ -14,6 +14,8 @@ export enum COLLECTION_TYPE {
 
 export const CollectionSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  username: { type: String, default: "" },
+  userAvtUrl: { type: String, default: "" },
   logoUrl: { type: String },
   name: { type: String },
   type: { type: Number, enum: [COLLECTION_TYPE.ERC_721, COLLECTION_TYPE.ERC_1155] },
@@ -26,6 +28,7 @@ export const CollectionSchema = new mongoose.Schema({
   txId: { type: String },
   collectionSalt: { type: String },
   creator: { type: String, default: "" },
+  symbol: { type: String }
 }, {
   timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' }
 });
@@ -33,6 +36,8 @@ export const CollectionSchema = new mongoose.Schema({
 export interface Collection extends mongoose.Document {
   _id: string,
   userId: string,
+  username: string,
+  userAvtUrl: string,
   logoUrl: string,
   name: string,
   type: number,
@@ -45,4 +50,7 @@ export interface Collection extends mongoose.Document {
   txId: string,
   collectionSalt: string,
   creator: string,
+  symbol: string,
+  createdAt: Date,
+  updatedAt: Date,
 }

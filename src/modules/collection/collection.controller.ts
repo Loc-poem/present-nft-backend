@@ -1,9 +1,9 @@
 import { ApiConsumes, ApiOperation, ApiTags } from "@nestjs/swagger";
-import { Controller, Post, Get, HttpCode, HttpStatus, Body, UploadedFile, UseInterceptors, Query } from "@nestjs/common";
+import { Controller, Post, Get, Put, HttpCode, HttpStatus, Body, UploadedFile, UseInterceptors, Query } from "@nestjs/common";
 import { Auth } from "../../common/decorator/auth.decorator";
 import { CurrentUser } from "../../common/decorator/user.decorator";
 import { collectionService } from "./collection.service";
-import { CreateCollectionDto, filterCollectionUserDto } from "./dto/collection.dto";
+import { CreateCollectionDto, filterCollectionUserDto, UnverifyCollectionDto } from "./dto/collection.dto";
 import { FileInterceptor } from "@nestjs/platform-express";
 
 @ApiTags('Collection')
@@ -30,5 +30,16 @@ export class collectionController {
   @ApiOperation({ summary: 'get collection of user' })
   async getCollectionOfUser(@CurrentUser() user, @Query() data: filterCollectionUserDto) {
     return this.collectionService.getListCollectionOfUser(user, data);
+  }
+
+  @Put('update-unverify')
+  @Auth()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Update unverify collection' })
+  async updateUnVerifyCollection(
+    @CurrentUser() user,
+    @Body() data: UnverifyCollectionDto,
+  ) {
+    return await this.collectionService.updateUnVerifyCollection(user, data);
   }
 }

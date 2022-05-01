@@ -15,15 +15,6 @@ import { s3Module } from "../s3/s3.module";
       { name: 'User', schema: UserSchema },
       { name: 'Collection', schema: CollectionSchema },
     ]),
-    JwtModule.registerAsync({
-      useFactory: async () => ({
-        secret: process.env.JWT_SECRET,
-        signOptions: {
-          expiresIn: process.env.JWT_EXPIRATION_TIME,
-        },
-      }),
-    }),
-    PassportModule.register({ defaultStrategy: "jwt" }),
     s3Module,
   ],
   providers: [collectionService],

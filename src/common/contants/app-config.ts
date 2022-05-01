@@ -17,4 +17,5 @@ export const AppConfig = {
   },
   LIMIT: 10,
   OFFSET: 0,
+  STATIC_DIR: 'src/assets',
 }
