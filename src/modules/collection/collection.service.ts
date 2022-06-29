@@ -33,20 +33,17 @@ export class collectionService {
 
     if (file.size > AppConfig.MAX_FILE_IMAGE_UPLOAD)
       throw new ApiError('Invalid file size.', 'E18', { field: 'fileLogo' });
-    const { type, fileLogo, name, description, contractAddress, txId, symbol } = data;
+    const { type, fileLogo, name, description, symbol, contractAddress, txId } = data;
     // get url code
     let { urlCode } = data;
     urlCode = await this.getUrlCode(data);
 
     // upload image to s3
     const newDataUpload = new uploadImageS3Dto();
-    const cut = file.originalname.split('.');
-    const fileExt = cut[cut.length - 1];
-    const time = new Date().getTime();
     const folder = AppConfig.FOLDER_IMAGE_UPLOAD.COLLECTION_LOGO;
-    newDataUpload.name = `${folder}/${user._id}-${time}.${fileExt}`;
-    newDataUpload.mimetype = file.mimetype;
-    newDataUpload.buffer = file.buffer;
+    newDataUpload.name = user._id;
+    newDataUpload.file = file;
+    newDataUpload.folder = folder;
     const uploadFileLogo = await this.s3Service.upload(newDataUpload);
 
     //create data of new collection
@@ -55,7 +52,7 @@ export class collectionService {
     dataCreate.type = type;
     dataCreate.userId = user._id;
     dataCreate.name = name.trim();
-    dataCreate.description = description.trim();
+    dataCreate.description = (description || "").trim();
     dataCreate.urlCode = urlCode;
     dataCreate.contractAddress = contractAddress;
     dataCreate.txId = txId;
@@ -102,7 +99,7 @@ export class collectionService {
   async getListCollectionOfUser(user, data: filterCollectionUserDto) {
     const where = {} as any;
     if (data.collectionId) where['_id'] = data.collectionId;
-    if (data.filterByUser === true) where.userId = user._id;
+    where.userId = user._id;
     if (data.status) where.status = data.status;
     let sortField = 'createdAt';
     let sortType = -1;

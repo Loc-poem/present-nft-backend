@@ -11,7 +11,6 @@ export enum COLLECTION_TYPE {
   ERC_1155 = 2,
 }
 
-
 export const CollectionSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   username: { type: String, default: "" },

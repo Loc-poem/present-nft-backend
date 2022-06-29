@@ -52,9 +52,6 @@ export class filterCollectionUserDto {
   collectionId: string;
 
   @ApiProperty({ required: false })
-  filterByUser: boolean;
-
-  @ApiProperty({ required: false })
   @IsOptional()
   @IsNumber()
   @Type(() => Number)

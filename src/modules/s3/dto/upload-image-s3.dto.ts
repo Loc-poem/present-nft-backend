@@ -1,6 +1,6 @@
 
 export class uploadImageS3Dto {
   name: string;
-  mimetype: string;
-  buffer: any;
+  folder: string;
+  file: Express.Multer.File
 }

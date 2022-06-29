@@ -9,13 +9,17 @@ export class s3Service {
   }
 
   async upload(data: uploadImageS3Dto) {
-    const { buffer, mimetype, name } = data;
+    const { file, name, folder } = data;
+    const cut = file.originalname.split('.');
+    const fileExt = cut[cut.length - 1];
+    const time = new Date().getTime();
+    let fileName = `${folder}/${name}-${time}.${fileExt}`;
     const s3 = this.getS3();
     const params = {
       Bucket: process.env.AWS_BUCKET,
-      Key: name,
-      Body: buffer,
-      ContentType: mimetype,
+      Key: fileName,
+      Body: file.buffer,
+      ContentType: file.mimetype,
       ACL: 'public-read',
     };
     return new Promise((resolve, reject) => {

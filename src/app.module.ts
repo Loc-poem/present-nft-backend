@@ -11,6 +11,8 @@ import { collectionModule } from "./modules/collection/collection.module";
 import { join } from "path";
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { AppConfig } from "./common/contants/app-config";
+import { artworkModule } from "./modules/artwork/artwork.module";
+import { categoryModule } from "./modules/category/category.module";
 
 @Module({
   imports: [
@@ -18,6 +20,8 @@ import { AppConfig } from "./common/contants/app-config";
     authModule,
     userModule,
     collectionModule,
+    artworkModule,
+    categoryModule,
     JwtModule.registerAsync({
       useFactory: async () => ({
         secret: process.env.JWT_SECRET,
