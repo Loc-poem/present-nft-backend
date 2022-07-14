@@ -2,6 +2,7 @@ import * as mongoose from "mongoose";
 
 export const ArtworkSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  ownerAddress: { type: String },
   sellOrderId: { type: mongoose.Schema.Types.ObjectId, ref: 'SellOrder' },
   imageUrl: { type: String },
   name: { type: String },
@@ -23,8 +24,10 @@ export const ArtworkSchema = new mongoose.Schema({
   urlCode: { type: String },
   collectionId: { type: mongoose.Schema.Types.ObjectId, ref: 'Collection' },
   tokenId: { type: String },
+  keys3: { type: String },
   contractAddress: { type: String },
   sellOrderActive: { type: Object, default: {} },
+  price: { type: String },
   categoriesId: { type: Array },
 }, {
   timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' }
@@ -33,6 +36,7 @@ export const ArtworkSchema = new mongoose.Schema({
 export interface Artwork extends mongoose.Document {
   _id: string;
   userId: string;
+  ownerAddress: string;
   sellOrderId: string;
   categoriesId: [];
   imageUrl: string;
@@ -54,10 +58,12 @@ export interface Artwork extends mongoose.Document {
   urlCode: string;
   collectionId: string;
   tokenId: string;
+  keys3: string;
   contractAddress: string;
   createdAt: Date;
   updatedAt: Date;
   sellOrderActive: object;
+  price: string;
   external_url: string;
 }
 

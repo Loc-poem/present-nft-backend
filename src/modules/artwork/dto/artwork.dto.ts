@@ -19,11 +19,6 @@ export class createArtworkDto {
   filePreview: any;
 
   @ApiProperty({ required: true, nullable: false })
-  @IsString()
-  @IsMongoId()
-  storeId: string;
-
-  @ApiProperty({ required: true, nullable: false })
   @IsNotEmpty()
   @IsString()
   @MaxLength(256)

@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNumber, IsOptional, IsString } from "class-validator";
+import { IsBoolean, IsNumber, IsOptional, IsString } from "class-validator";
 import { Type } from "class-transformer";
 
 export class filterGetListDto {
@@ -7,6 +7,11 @@ export class filterGetListDto {
   @IsOptional()
   @IsString()
   name: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsBoolean()
+  show: boolean;
 
   @ApiProperty({ required: false })
   @IsOptional()

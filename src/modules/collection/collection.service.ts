@@ -101,6 +101,8 @@ export class collectionService {
     if (data.collectionId) where['_id'] = data.collectionId;
     where.userId = user._id;
     if (data.status) where.status = data.status;
+    if (data.name) where.name = { '$regex': Utils.escapeRegex(data.name || ""), '$options': 'i' };
+    if (data.type) where.type = data.type;
     let sortField = 'createdAt';
     let sortType = -1;
     if (data.sortField && data.sortType) {

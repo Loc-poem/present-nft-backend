@@ -53,6 +53,17 @@ export class filterCollectionUserDto {
 
   @ApiProperty({ required: false })
   @IsOptional()
+  @IsString()
+  name: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsNumber()
+  @Type(() => Number)
+  type: number;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
   @IsNumber()
   @Type(() => Number)
   limit: number;

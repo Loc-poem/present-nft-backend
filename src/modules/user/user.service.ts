@@ -12,8 +12,14 @@ export class userService {
   ) {
   }
 
+  async getUserById(id: string) {
+    const userData = await this.userModel.findOne({ _id: id }).lean();
+    if (!userData) throw new ApiError("Invalid user", "E-1");
+    return userData;
+  }
+
   async getUserInformation(user: any) {
-    const userData = await this.userModel.findOne({ _id: user._id }).lean();
+    const userData = await this.getUserById(user._id);
     if (!userData) throw new ApiError("Invalid user", "E-1");
     const returnData = {
       username: userData.username || "",

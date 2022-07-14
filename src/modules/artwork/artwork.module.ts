@@ -6,6 +6,7 @@ import { ArtworkSchema } from "../../database/models/artwork.model";
 import { s3Module } from "../s3/s3.module";
 import { CategorySchema } from "../../database/models/category.model";
 import { CollectionSchema } from "../../database/models/collection.model";
+import { UserSchema } from "../../database/models/user.model";
 
 @Module({
   imports: [
@@ -14,7 +15,8 @@ import { CollectionSchema } from "../../database/models/collection.model";
       { name: 'Artwork', schema: ArtworkSchema },
       { name: 'Category', schema: CategorySchema },
       { name: 'Collection', schema: CollectionSchema },
-    ])
+      { name: 'User', schema: UserSchema },
+    ]),
   ],
   controllers: [artworkController],
   providers: [artworkService],

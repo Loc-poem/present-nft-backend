@@ -7,6 +7,7 @@ import { s3Service } from "../s3/s3.service";
 import { uploadImageS3Dto } from "../s3/dto/upload-image-s3.dto";
 import { AppConfig } from "../../common/contants/app-config";
 import { CATEGORIES_STATUS, Category } from "../../database/models/category.model";
+import { User } from "../../database/models/user.model";
 import { ApiError } from "../../common/response/api-error";
 import { isEmpty, omit, get } from 'lodash'
 import { Collection, COLLECTION_TYPE } from "../../database/models/collection.model";
@@ -20,11 +21,13 @@ export class artworkService {
     @InjectModel('Artwork') private readonly artworkModel: Model<Artwork>,
     @InjectModel('Category') private readonly categoryModel: Model<Category>,
     @InjectModel('Collection') private readonly collectionModel: Model<Collection>,
+    @InjectModel('User') private readonly userModel: Model<User>,
     private readonly s3Service: s3Service,
   ) {}
 
   async createArtwork(user, data: createArtworkDto, file: Express.Multer.File, filePreview: Express.Multer.File) {
     try {
+      const userData = await this.userModel.findOne({ _id: user._id }, { networkAddress: 1, _id: 1 }).lean();
       let dataUploadArtwork = new uploadImageS3Dto();
       dataUploadArtwork.file = file;
       dataUploadArtwork.name = user._id;
@@ -43,7 +46,7 @@ export class artworkService {
       const cut = data.categoriesId.split(',');
       const ids = cut.map((e) => { return e.trim() });
       const categories = await this.categoryModel
-        .find({ storeId: data.storeId, status: CATEGORIES_STATUS.ON })
+        .find({ status: CATEGORIES_STATUS.ON })
         .where('_id').in(ids).exec();
       if (categories.length === 0) throw new ApiError('categories not found.', 'E32');
       const collectionData = await this.collectionModel.findOne({ _id: data.collectionId }, { userId: 1, storeId: 1, type: 1, contractAddress: 1 }).lean();
@@ -51,7 +54,7 @@ export class artworkService {
       if (data.fileType !== FILE_TYPE.IMAGE && !dataValidate.imageUrl) throw new ApiError("Image url is required", "E-1");
       const urlCode = await this.getUrlCode(data, user._id);
       const external_url = `https://${process.env.domain}/artwork/${urlCode}`;
-      const dataCreateArtwork = this.validateDataCreate(dataValidate, user, collectionData, ids, urlCode, external_url);
+      const dataCreateArtwork = this.validateDataCreate(dataValidate, userData, collectionData, ids, urlCode, external_url);
       const newArtwork = await this.artworkModel.create(dataCreateArtwork);
       return new ApiOK({
         artworkId: newArtwork._id,
@@ -65,6 +68,7 @@ export class artworkService {
     const nftifyTokenIdData = Utils.generateTokenId();
     const newArtwork = {
       userId: user._id,
+      ownerAddress: user.networkAddress,
       imageUrl: dataValidate.imageUrl,
       status: ARTWORK_STATUS.OFF_SALE,
       name: dataValidate.name,
