@@ -14,6 +14,7 @@ import { Collection, COLLECTION_TYPE } from "../../database/models/collection.mo
 import { Utils } from "../../common/utils/utils";
 import { ApiOK } from "../../common/response/api-ok";
 import { filterGetListDto } from "./dto/filter-artwork.dto";
+import { ObjectId } from 'mongodb'
 
 @Injectable()
 export class artworkService {
@@ -49,7 +50,7 @@ export class artworkService {
         .find({ status: CATEGORIES_STATUS.ON })
         .where('_id').in(ids).exec();
       if (categories.length === 0) throw new ApiError('categories not found.', 'E32');
-      const collectionData = await this.collectionModel.findOne({ _id: data.collectionId }, { userId: 1, storeId: 1, type: 1, contractAddress: 1 }).lean();
+      const collectionData = await this.collectionModel.findOne({ _id: data.collectionId }, { userId: 1, storeId: 1, type: 1, contractAddress: 1, name: 1 }).lean();
       if (collectionData.type === COLLECTION_TYPE.ERC_721) data.numberOfCopies = AppConfig.NFT_ERC_721_QUANTITY;
       if (data.fileType !== FILE_TYPE.IMAGE && !dataValidate.imageUrl) throw new ApiError("Image url is required", "E-1");
       const urlCode = await this.getUrlCode(data, user._id);
@@ -89,6 +90,7 @@ export class artworkService {
       contractAddress: collectionData.contractAddress,
       categoriesId: Utils.getUniqueArray(ids),
       external_url: external_url,
+      collectionName: collectionData.name,
     };
     return newArtwork;
   }
@@ -114,45 +116,49 @@ export class artworkService {
   }
 
   async getListArtwork(user, filter: filterGetListDto) {
-    const { name, collectionId, contractAddress, status, limit, offset } = filter;
-    let agg = [];
-    let where = {};
-    let sort = {
-      $sort: {
+    try {
+      const { name, collectionId, contractAddress, status, limit, offset } = filter;
+      let agg = [];
+      let where = {};
+      let sort = {
+        $sort: {
+        }
       }
-    }
-    const collation = { locale: "en" };
-    where['userId'] = user._id;
-    if (name) where['name'] = {'$regex': Utils.escapeRegex(name), '$options': 'i'};
-    if (collectionId) where['collectionId'] = collectionId;
-    if (contractAddress) where['contractAddress'] = contractAddress;
-    if (status) where['status'] = status;
-    let sortField = AppConfig.DEFAULT_SORT_FIELD;
-    let sortType = AppConfig.SORT_DESC;
-    if (filter.sortField && filter.sortType) {
-      sortType = filter.sortType;
-      sortField = filter.sortField;
-    }
-    sort.$sort[sortField] = sortType;
+      const collation = { locale: "en" };
+      where['userId'] = new ObjectId(user._id);
+      if (name) where['name'] = {'$regex': Utils.escapeRegex(name), '$options': 'i'};
+      if (collectionId) where['collectionId'] = collectionId;
+      if (contractAddress) where['contractAddress'] = contractAddress;
+      if (status) where['status'] = status;
+      let sortField = AppConfig.DEFAULT_SORT_FIELD;
+      let sortType = AppConfig.SORT_DESC;
+      if (filter.sortField && filter.sortType) {
+        sortType = filter.sortType;
+        sortField = filter.sortField;
+      }
+      sort.$sort[sortField] = sortType;
 
-    agg.push({ $match: where });
-    agg.push(sort);
-    agg.push({
-      $facet: {
-        count:  [{ $count: "count" }],
-        data: [
-          { $skip: offset || AppConfig.OFFSET },
-          { $limit: limit || AppConfig.LIMIT }
-        ]
-      }
-    });
-    let dataQuery = await this.categoryModel.aggregate(agg).collation(collation);
-    const dataCategory = get(dataQuery, [0, 'data']) || [];
-    const total = get(dataQuery, [0, 'count', 0, 'count']) || 0;
-    return new ApiOK({
-      total: total,
-      records: dataCategory,
-    })
+      agg.push({ $match: where });
+      agg.push(sort);
+      agg.push({
+        $facet: {
+          count:  [{ $count: "count" }],
+          data: [
+            { $skip: offset || AppConfig.OFFSET },
+            { $limit: limit || AppConfig.LIMIT }
+          ]
+        }
+      });
+      let dataQuery = await this.categoryModel.aggregate(agg).collation(collation);
+      const dataList = get(dataQuery, [0, 'data']) || [];
+      const total = get(dataQuery, [0, 'count', 0, 'count']) || 0;
+      return new ApiOK({
+        total: total,
+        records: dataList,
+      })
+    } catch (e) {
+      throw new ApiError("Error" + e);
+    }
   }
 
   async getDetail(user, id) {
@@ -166,6 +172,16 @@ export class artworkService {
       })
     } catch (e) {
       throw new ApiError("Error: " + e);
+    }
+  }
+
+  async getById(id: string) {
+    try {
+      const artworkData = await this.artworkModel.findOne({ _id: id }).lean();
+      if (!artworkData) throw new ApiError("Invalid id");
+      return artworkData;
+    } catch (e) {
+      throw new ApiError("Error" + e);
     }
   }
 }

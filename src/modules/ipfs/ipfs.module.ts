@@ -5,13 +5,13 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { ArtworkSchema } from "../../database/models/artwork.model";
 
 @Module({
-  providers: [],
+  providers: [ipfsService],
   imports: [
     MongooseModule.forFeature([
       { name: 'Artwork', schema: ArtworkSchema },
     ]),
     s3Module,
   ],
-  exports: [],
+  exports: [ipfsService],
 })
 export class ipfsModule { }

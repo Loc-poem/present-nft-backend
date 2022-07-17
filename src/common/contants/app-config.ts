@@ -34,4 +34,8 @@ export const AppConfig = {
   DEFAULT_SORT_FIELD: 'createdAt',
   SORT_DESC: -1,
   SORT_ASC: 1,
+  MINIMUM_INCREMENT_PERCENT: 5,
+  MAXIMUM_INCREMENT_PERCENT: 100,
+  EXPIRED_DAY: 3,
+
 }

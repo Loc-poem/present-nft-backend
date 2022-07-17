@@ -23,6 +23,7 @@ export const ArtworkSchema = new mongoose.Schema({
   contentUrl: { type: String },
   urlCode: { type: String },
   collectionId: { type: mongoose.Schema.Types.ObjectId, ref: 'Collection' },
+  collectionName: { type: String },
   tokenId: { type: String },
   keys3: { type: String },
   contractAddress: { type: String },
@@ -54,6 +55,7 @@ export interface Artwork extends mongoose.Document {
   chainId: number;
   show: boolean;
   collectionType: number;
+  collectionName: string;
   contentUrl: string;
   urlCode: string;
   collectionId: string;
