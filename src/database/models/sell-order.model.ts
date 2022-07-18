@@ -34,6 +34,7 @@ export const SellOrderSchema = new mongoose.Schema({
   expiredDate: { type: Date },
   eventStatus: { type: Number, default: 1 },
   incrementPercent: { type: Number },
+  metadata: { type: Object },
 },{
   timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' },
 });
@@ -60,6 +61,15 @@ export interface SellOrder extends mongoose.Document {
   expiredDate: Date;
   eventStatus: number;
   incrementPercent: number;
+  metadata: object;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export enum TIME_AUCTION_STATUS {
+  COMING_SOON = 0,
+  LIVE = 1,
+  SELECTING = 2,
+  ENDED =3,
+  ALL =4,
 }

@@ -16,7 +16,7 @@ export class sellOrderController {
   @Auth()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: "create sell order" })
-  createArtwork(@CurrentUser() user, @Body() data: createSellOrderDto) {
-    return this.sellOrderService.createArtwork(user, data);
+  createSellOrder(@CurrentUser() user, @Body() data: createSellOrderDto) {
+    return this.sellOrderService.createSellOrder(user, data);
   }
 }
